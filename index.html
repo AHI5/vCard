@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Активация NFC-карты - Виртуальные визитки</title>
+    <style>
+        @media screen and (max-width: 768px) {
+            .site-header > div {
+                height: 60px !important;
+                padding: 0 15px !important;
+            }
+            .site-header > div > a > img {
+                height: 38px !important;
+            }
+            .site-header > div > a > span {
+                font-size: 16px !important;
+            }
+            .site-header + div {
+                height: 60px !important;
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            margin: 90px auto 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: #f7fafc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #5a67d8;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.08);
+        }
+
+        .form-group input::placeholder {
+            color: #a0aec0;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .info-box {
+            background: #f7fafc;
+            border-left: 3px solid #cbd5e0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .info-box p {
+            color: #4a5568;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .btn-activate {
+            width: 100%;
+            padding: 14px;
+            background: #5a67d8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-activate:hover {
+            background: #4c51bf;
+        }
+
+        .btn-activate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .error-message {
+            display: none;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .error-message #allowedDomainsInfo {
+            margin-top: 10px;
+            text-align: left;
+            white-space: pre-line;
+            font-size: 13px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #5a67d8;
+        }
+
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #5a67d8;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                margin-top: 80px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Активация NFC-карты</h1>
+            <p>Введите данные вашей карты для активации</p>
+        </div>
+
+        <div class="info-box">
+            <p>
+                <strong>Как активировать карту?</strong><br>
+                Введите ваш Email, на который в течение 15 минут придёт письмо с логином и паролем для входа в личный кабинет, и код активации, указанный на вашей NFC-карте.
+                После активации вы получите доступ ко всем функциям цифровой визитки.
+            </p>
+        </div>
+
+        <form id="activationForm">
+            <div class="form-group">
+                <label for="email">Email для подтверждения</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="your@mail.ru"
+                    required
+                >
+                <small id="emailHint">Разрешены: @mail.ru, @yandex.ru, @rambler.ru, @vk.com и другие .ru домены</small>
+            </div>
+
+            <div class="form-group">
+                <label for="activationCode">Код активации</label>
+                <input 
+                    type="text" 
+                    id="activationCode" 
+                    name="activationCode" 
+                    placeholder="VK-001"
+                    required
+                    maxlength="20"
+                    style="text-transform: uppercase;"
+                >
+                <small>Код указан на вашей NFC-карте</small>
+            </div>
+
+            <button type="submit" class="btn-activate" id="submitBtn">Активировать карту</button>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Активация карты...</p>
+            </div>
+
+            <div id="successMessage" class="success-message">
+                Карта успешно активирована! Проверьте вашу почту.
+            </div>
+
+            <div id="errorMessage" class="error-message">
+                <span id="errorText">Ошибка активации.</span>
+                <div id="allowedDomainsInfo"></div>
+            </div>
+        </form>
+    </div>
+
+    <header class="site-header" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-bottom: 1px solid #e2e8f0; z-index: 9999;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; height: 70px; display: flex; align-items: center; justify-content: space-between;">
+            <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2d3748;">
+                <img src="/static/logo.jpeg" alt="Логотип" style="height: 45px; width: auto; object-fit: contain;">
+                <span style="font-size: 18px; font-weight: 600;">Виртуальные визитки</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="/activate" style="padding: 8px 16px; color: #4a5568; text-decoration: none; font-size: 14px; font-weight: 500;">Активация</a>
+                <a href="/login" style="padding: 8px 16px; background: #5a67d8; color: white; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 6px;">Войти</a>
+            </div>
+        </div>
+    </header>
+    <div style="height: 70px;"></div>
+
+    <script>
+        const form = document.getElementById('activationForm');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const allowedDomainsInfo = document.getElementById('allowedDomainsInfo');
+        const loading = document.getElementById('loading');
+        const submitBtn = document.getElementById('submitBtn');
+        const emailInput = document.getElementById('email');
+        const emailHint = document.getElementById('emailHint');
+        const activationCodeInput = document.getElementById('activationCode');
+
+        activationCodeInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        emailInput.addEventListener('blur', async function() {
+            const email = emailInput.value.trim();
+            if (!email) return;
+
+            try {
+                const response = await fetch('/api/check-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await response.json();
+
+                if (!data.valid) {
+                    emailInput.style.borderColor = '#e53e3e';
+                    emailHint.style.color = '#e53e3e';
+                    emailHint.textContent = data.error;
+                } else {
+                    emailInput.style.borderColor = '#48bb78';
+                    emailHint.style.color = '#48bb78';
+                    emailHint.textContent = 'Email принят';
+                }
+            } catch (error) {
+                console.error('Ошибка проверки email:', error);
+            }
+        });
+
+        emailInput.addEventListener('input', function() {
+            emailInput.style.borderColor = '#e2e8f0';
+            emailHint.style.color = '#718096';
+            emailHint.textContent = 'Разрешены: @mail.ru, @yandex.ru, @rambler.ru, @vk.com и другие .ru домены';
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            const activationCode = activationCodeInput.value.trim();
+
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            allowedDomainsInfo.textContent = '';
+            
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/activate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        activationCode: activationCode
+                    })
+                });
+
+                const data = await response.json();
+
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+
+                if (response.ok || response.status === 207) {
+                    successMessage.style.display = 'block';
+                    form.reset();
+                    
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 10000);
+                } else {
+                    errorText.textContent = data.error || 'Ошибка активации.';
+                    
+                    if (data.allowedDomains) {
+                        allowedDomainsInfo.textContent = data.allowedDomains;
+                    }
+                    
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                errorText.textContent = 'Ошибка соединения с сервером. Попробуйте позже.';
+                errorMessage.style.display = 'block';
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

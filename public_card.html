@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Визитная карточка</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-width: 450px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 40px 20px 50px;
+            text-align: center;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .avatar {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 4px solid white;
+            object-fit: cover;
+            background: #edf2f7;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: 2;
+        }
+
+        .avatar-placeholder {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-body {
+            padding: 30px 30px 20px;
+            text-align: center;
+        }
+
+        .name {
+            font-size: 26px;
+            color: #2d3748;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .position {
+            font-size: 14px;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .company {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 25px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 20px 0;
+        }
+
+        .contact-list { list-style: none; text-align: left; }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .contact-item:last-child { border-bottom: none; }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .contact-icon svg { width: 18px; height: 18px; }
+
+        .contact-info { flex: 1; min-width: 0; }
+
+        .contact-label {
+            font-size: 11px;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .contact-value {
+            font-size: 15px;
+            color: #2d3748;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        .contact-value:hover { opacity: 0.8; }
+
+        .socials {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+            background: #edf2f7;
+        }
+
+        .social-btn svg { width: 22px; height: 22px; fill: #4a5568; }
+
+        .actions {
+            padding: 0 30px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 13px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            color: white;
+        }
+
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn svg { width: 18px; height: 18px; fill: white; }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 14px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            background: white;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            color: #4a5568;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .btn-action:hover { transform: translateY(-2px); }
+        .btn-action svg { width: 22px; height: 22px; fill: currentColor; }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background: #f7fafc;
+            font-size: 12px;
+            color: #a0aec0;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer strong { font-weight: 600; }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-container {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .error-icon { font-size: 50px; margin-bottom: 20px; color: #cbd5e0; }
+        .error-title { font-size: 20px; color: #2d3748; margin-bottom: 10px; font-weight: 600; }
+        .error-text { color: #718096; font-size: 14px; margin-bottom: 25px; line-height: 1.6; }
+
+        .error-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .card-body { padding: 25px 20px 15px; }
+            .name { font-size: 22px; }
+            .actions { padding: 0 20px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="cardContainer">
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <p>Загрузка визитки...</p>
+        </div>
+
+        <div id="cardContent" style="display: none;">
+            <div class="card-header" id="cardHeader">
+                <div id="avatarContainer"></div>
+            </div>
+
+            <div class="card-body">
+                <h1 class="name" id="fullName"></h1>
+                <div class="position" id="position"></div>
+                <div class="company" id="company"></div>
+
+                <div class="divider"></div>
+
+                <ul class="contact-list">
+                    <li class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 24 24" id="phoneIcon"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.58l2.2-2.21c.28-.27.36-.66.25-1.01C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-label" id="phoneLabel">Телефон</div>
+                            <a href="#" class="contact-value" id="phoneLink"></a>
+                        </div>
+                    </li>
+
+                    <li class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 24 24" id="emailIcon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-label" id="emailLabel">Email</div>
+                            <a href="#" class="contact-value" id="emailLink"></a>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="socials" id="socials"></div>
+            </div>
+
+            <div class="actions">
+                <a href="#" class="btn" id="vcardLink">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    <span id="vcardText">Сохранить контакт</span>
+                </a>
+
+                <div class="action-buttons">
+                    <a href="#" class="btn-action" id="callBtn">
+                        <svg viewBox="0 0 24 24"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.58l2.2-2.21c.28-.27.36-.66.25-1.01C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+                        <span id="callText">Позвонить</span>
+                    </a>
+                    <a href="#" class="btn-action" id="emailBtn">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        <span id="emailBtnText">Написать</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer">
+                NFC-визитка · Код: <strong id="cardCode"></strong>
+            </div>
+        </div>
+
+        <div id="errorState" style="display: none;" class="error-container">
+            <div class="error-icon">—</div>
+            <h2 class="error-title" id="errorTitle">Ошибка</h2>
+            <p class="error-text" id="errorText"></p>
+            <a href="/" class="error-btn" id="errorBtn">На главную</a>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            ru: {
+                saveContact: 'Сохранить контакт',
+                call: 'Позвонить',
+                write: 'Написать',
+                phone: 'Телефон',
+                email: 'Email',
+                home: 'На главную'
+            },
+            en: {
+                saveContact: 'Save contact',
+                call: 'Call',
+                write: 'Write',
+                phone: 'Phone',
+                email: 'Email',
+                home: 'Home'
+            }
+        };
+
+        const socialIcons = {
+            telegram: {
+                getUrl: v => 'https://t.me/' + v.replace('@', ''),
+                svg: '<svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>'
+            },
+            instagram: {
+                getUrl: v => 'https://instagram.com/' + v.replace('@', ''),
+                svg: '<svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>'
+            },
+            whatsapp: {
+                getUrl: v => 'https://wa.me/' + v.replace(/[^0-9]/g, ''),
+                svg: '<svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 012.41 5.83c0 4.54-3.7 8.23-8.24 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.17-3.12.82.83-3.04-.2-.32a8.188 8.188 0 01-1.26-4.38c.01-4.54 3.7-8.24 8.25-8.24M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.86-.87 2.07 0 1.22.89 2.39 1 2.56.14.17 1.76 2.67 4.25 3.73.59.27 1.05.42 1.41.53.59.19 1.13.16 1.56.1.48-.07 1.46-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.07-.1-.23-.16-.48-.27-.25-.14-1.47-.74-1.69-.82-.23-.08-.37-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.23-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.11-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01z"/></svg>'
+            },
+            vk: {
+                getUrl: v => v.startsWith('http') ? v : 'https://vk.com/' + v,
+                svg: '<svg viewBox="0 0 24 24"><path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14c5.6 0 6.93-1.33 6.93-6.93V8.93C22 3.33 20.67 2 15.07 2m3.08 14.27h-1.45c-.55 0-.72-.44-1.71-1.45-.86-.84-1.24-.95-1.45-.95-.3 0-.39.09-.39.5v1.31c0 .36-.12.58-1.06.58-1.55 0-3.27-.94-4.48-2.69C5.8 11.09 5 8.77 5 8.2c0-.22.09-.41.5-.41h1.45c.37 0 .5.17.64.56.7 2.02 1.86 3.79 2.34 3.79.18 0 .26-.08.26-.54V9.83c-.05-.87-.51-.95-.51-1.26 0-.15.13-.31.33-.31h2.28c.31 0 .42.17.42.53v2.42c0 .31.14.42.23.42.18 0 .33-.11.66-.44 1.02-1.14 1.75-2.9 1.75-2.9.09-.22.25-.41.61-.41h1.45c.44 0 .53.22.44.53-.18.85-1.95 3.35-1.95 3.35-.15.25-.21.36 0 .64.15.21.64.64.97 1.02.6.68 1.06 1.26 1.19 1.65.13.41-.08.61-.49.61z"/></svg>'
+            },
+            max: {
+                getUrl: v => v.startsWith('http') ? v : 'https://' + v,
+                svg: '<svg viewBox="0 0 24 24"><path d="M3 3h4l3 8 3-8h4v14h-3V9l-3 8h-2l-3-8v8H3z"/></svg>'
+            }
+        };
+
+        function getCardCodeFromUrl() {
+            const match = window.location.pathname.match(/\/u\/([^\/]+)/);
+            return match ? match[1].toUpperCase() : null;
+        }
+
+        function showError(icon, title, text, btnColor) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('cardContent').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.querySelector('.error-icon').textContent = icon;
+            document.getElementById('errorTitle').textContent = title;
+            document.getElementById('errorText').textContent = text;
+            if (btnColor) {
+                document.getElementById('errorBtn').style.background = btnColor;
+            }
+        }
+
+        function renderAvatar(photoUrl, firstName, buttonColor, showAvatar) {
+            const container = document.getElementById('avatarContainer');
+            
+            if (!showAvatar) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            if (photoUrl) {
+                const img = document.createElement('img');
+                img.className = 'avatar';
+                img.src = photoUrl;
+                img.alt = firstName;
+                img.onerror = function() {
+                    renderAvatarPlaceholder(firstName, buttonColor);
+                };
+                container.innerHTML = '';
+                container.appendChild(img);
+            } else {
+                renderAvatarPlaceholder(firstName, buttonColor);
+            }
+        }
+
+        function renderAvatarPlaceholder(firstName, buttonColor) {
+            const container = document.getElementById('avatarContainer');
+            const letter = firstName ? firstName.charAt(0).toUpperCase() : '?';
+            container.innerHTML = `<div class="avatar-placeholder" style="color: ${buttonColor};">${letter}</div>`;
+        }
+
+        function renderSocials(data, buttonColor) {
+            const container = document.getElementById('socials');
+            container.innerHTML = '';
+            
+            const socialsList = [
+                { key: 'telegram', value: data.social_telegram },
+                { key: 'instagram', value: data.social_instagram },
+                { key: 'whatsapp', value: data.social_whatsapp },
+                { key: 'vk', value: data.social_vk },
+                { key: 'max', value: data.social_max }
+            ];
+            
+            socialsList.forEach(item => {
+                if (item.value) {
+                    const info = socialIcons[item.key];
+                    const link = document.createElement('a');
+                    link.href = info.getUrl(item.value);
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.className = 'social-btn';
+                    link.innerHTML = info.svg;
+                    link.querySelector('svg').style.fill = buttonColor;
+                    container.appendChild(link);
+                }
+            });
+        }
+
+        function applyTheme(data) {
+            const body = document.body;
+            const header = document.getElementById('cardHeader');
+            const vcardBtn = document.getElementById('vcardLink');
+            
+            if (data.bg_image_url) {
+                header.style.backgroundImage = `url('${data.bg_image_url}')`;
+                body.style.background = data.bg_color;
+            } else if (data.gradient_enabled) {
+                header.style.background = `linear-gradient(${data.gradient_direction}, ${data.gradient_color1}, ${data.gradient_color2})`;
+                body.style.background = data.bg_color;
+            } else {
+                header.style.background = data.bg_color;
+                body.style.background = data.bg_color;
+            }
+            
+            vcardBtn.style.background = data.button_color;
+            document.getElementById('position').style.color = data.button_color;
+            document.getElementById('cardCode').style.color = data.button_color;
+            document.querySelectorAll('.contact-icon svg').forEach(svg => {
+                svg.style.fill = data.button_color;
+            });
+            
+            const t = translations[data.button_language] || translations.ru;
+            document.getElementById('vcardText').textContent = t.saveContact;
+            document.getElementById('callText').textContent = t.call;
+            document.getElementById('emailBtnText').textContent = t.write;
+            document.getElementById('phoneLabel').textContent = t.phone;
+            document.getElementById('emailLabel').textContent = t.email;
+            document.getElementById('errorBtn').textContent = t.home;
+        }
+
+        function renderCard(data) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('cardContent').style.display = 'block';
+            
+            applyTheme(data);
+            renderAvatar(data.photo_url, data.first_name, data.button_color, data.show_avatar);
+            
+            const middle = data.middle_name ? ' ' + data.middle_name : '';
+            document.getElementById('fullName').textContent = `${data.first_name}${middle} ${data.last_name}`;
+            
+            document.getElementById('position').textContent = data.position;
+            document.getElementById('position').style.display = data.position ? 'block' : 'none';
+            document.getElementById('company').textContent = data.company;
+            document.getElementById('company').style.display = data.company ? 'block' : 'none';
+            
+            document.getElementById('phoneLink').textContent = data.phone;
+            document.getElementById('phoneLink').href = 'tel:' + data.phone;
+            document.getElementById('callBtn').href = 'tel:' + data.phone;
+            
+            document.getElementById('emailLink').textContent = data.email;
+            document.getElementById('emailLink').href = 'mailto:' + data.email;
+            document.getElementById('emailBtn').href = 'mailto:' + data.email;
+            
+            document.getElementById('vcardLink').href = '/u/' + data.card_code + '/vcard';
+            document.getElementById('cardCode').textContent = data.card_code;
+            
+            document.title = `${data.first_name} ${data.last_name}`;
+            
+            renderSocials(data, data.button_color);
+        }
+
+        async function loadCardData() {
+            const code = getCardCodeFromUrl();
+            
+            if (!code) {
+                showError('—', 'Неверная ссылка', 'Код карты не найден в адресе.', '#5a67d8');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/public-card/' + code);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    showError('—', 'Ошибка', data.error || 'Не удалось загрузить визитку', '#5a67d8');
+                    return;
+                }
+                
+                if (data.status === 'free') {
+                    window.location.href = data.redirect;
+                    return;
+                }
+                
+                if (data.status === 'not_filled') {
+                    window.location.href = '/card-not-filled';
+                    return;
+                }
+                
+                if (data.status === 'ok') {
+                    renderCard(data);
+                }
+                
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                showError('—', 'Ошибка соединения', 'Не удалось связаться с сервером.', '#5a67d8');
+            }
+        }
+
+        loadCardData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Визитка не заполнена</title>
+    <style>
+        @media screen and (max-width: 768px) {
+            .site-header > div {
+                height: 60px !important;
+                padding: 0 15px !important;
+            }
+            .site-header > div > a > img {
+                height: 38px !important;
+            }
+            .site-header > div > a > span {
+                font-size: 16px !important;
+            }
+            .site-header + div {
+                height: 60px !important;
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            max-width: 450px;
+            width: 100%;
+            padding: 50px 30px;
+            text-align: center;
+            margin: 90px auto 20px;
+        }
+
+        .icon {
+            font-size: 50px;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        p {
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: #5a67d8;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #4c51bf;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                margin-top: 80px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">—</div>
+        <h1>Визитка ещё не заполнена</h1>
+        <p>Владелец этой NFC-карты активировал её, но ещё не заполнил данные своей визитки.</p>
+        <a href="/login" class="btn">Войти в личный кабинет</a>
+    </div>
+
+    <header class="site-header" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-bottom: 1px solid #e2e8f0; z-index: 9999;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; height: 70px; display: flex; align-items: center; justify-content: space-between;">
+            <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2d3748;">
+                <img src="/static/logo.jpeg" alt="Логотип" style="height: 45px; width: auto; object-fit: contain;">
+                <span style="font-size: 18px; font-weight: 600;">Виртуальные визитки</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="/cabinet" style="padding: 8px 16px; color: #4a5568; text-decoration: none; font-size: 14px; font-weight: 500;">Кабинет</a>
+                <a href="/admin" style="padding: 8px 16px; color: #4a5568; text-decoration: none; font-size: 14px; font-weight: 500;">Админ</a>
+                <a href="/login" style="padding: 8px 16px; color: #c53030; text-decoration: none; font-size: 14px; font-weight: 500;">Выйти</a>
+            </div>
+        </div>
+    </header>
+    <div style="height: 70px;"></div>
+</body>
+</html>

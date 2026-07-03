@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Админ-панель - Виртуальные визитки</title>
+    <style>
+        @media screen and (max-width: 768px) {
+            .site-header > div {
+                height: 60px !important;
+                padding: 0 15px !important;
+            }
+            .site-header > div > a > img {
+                height: 38px !important;
+            }
+            .site-header > div > a > span {
+                font-size: 16px !important;
+            }
+            .site-header + div {
+                height: 60px !important;
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 90px auto 20px;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title h1 {
+            color: #2d3748;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .admin-badge {
+            background: #5a67d8;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #5a67d8;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label { font-size: 13px; color: #718096; }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #718096;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .tab:hover { color: #5a67d8; }
+        .tab.active { color: #5a67d8; border-bottom-color: #5a67d8; }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .tab-content.active { display: block; }
+
+        .table-wrapper { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead { background: #f7fafc; }
+
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 15px;
+            color: #2d3748;
+            border-bottom: 1px solid #f5f7fa;
+            vertical-align: middle;
+        }
+
+        tr:hover { background: #fafbfc; }
+
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-free { background: #f0fff4; color: #22543d; }
+        .status-activated { background: #ebf8ff; color: #2c5282; }
+        .status-blocked { background: #fff5f5; color: #742a2a; }
+
+        .btn {
+            padding: 6px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            color: #4a5568;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-right: 5px;
+        }
+
+        .btn:hover { background: #f7fafc; border-color: #cbd5e0; }
+        .btn-danger { color: #c53030; border-color: #fed7d7; }
+        .btn-danger:hover { background: #fff5f5; }
+        .btn-warning { color: #c77d1c; border-color: #feebc8; }
+        .btn-warning:hover { background: #fffaf0; }
+        .btn-primary { background: #5a67d8; color: white; border-color: #5a67d8; }
+        .btn-primary:hover { background: #4c51bf; }
+        .btn-add { padding: 10px 20px; font-size: 14px; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 { font-size: 18px; color: #2d3748; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #a0aec0;
+            line-height: 1;
+        }
+
+        .modal-body { padding: 20px; }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #4a5568;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #5a67d8;
+        }
+
+        .form-group small {
+            color: #718096;
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .mode-switcher {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preview-box {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-top: 10px;
+        }
+
+        .preview-box .preview-title {
+            color: #4a5568;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .preview-box .preview-content {
+            font-family: monospace;
+            color: #5a67d8;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .codes-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2d3748;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 3000;
+            transform: translateX(500px);
+            transition: transform 0.3s;
+            white-space: pre-line;
+            max-width: 400px;
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: #38a169; }
+        .toast.error { background: #e53e3e; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .password-display {
+            background: #f7fafc;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-top: 10px;
+            border: 1px solid #e2e8f0;
+            word-break: break-all;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; padding-top: 80px; }
+            .page-title h1 { font-size: 22px; }
+            .stat-card .stat-value { font-size: 24px; }
+            th, td { padding: 8px 10px; font-size: 12px; }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                margin-top: 80px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-title">
+            <h1>Админ-панель</h1>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="statUsers">—</div>
+                <div class="stat-label">Пользователей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statCards">—</div>
+                <div class="stat-label">Всего карт</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statFree">—</div>
+                <div class="stat-label">Свободных карт</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statActivated">—</div>
+                <div class="stat-label">Активировано</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statProfiles">—</div>
+                <div class="stat-label">Заполнено профилей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statVisits">—</div>
+                <div class="stat-label">Посещений</div>
+            </div>
+        </div>
+
+        <div class="top-bar">
+            <div class="tabs">
+                <button class="tab active" data-tab="users">Пользователи</button>
+                <button class="tab" data-tab="cards">Карты</button>
+                <button class="tab" data-tab="profiles">Профили</button>
+                <button class="tab" data-tab="visits">Посещения</button>
+            </div>
+            <button class="btn btn-primary btn-add" onclick="openAddCardsModal()">+ Добавить карты</button>
+        </div>
+
+        <div class="tab-content active" id="tab-users">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Код карты</th>
+                            <th>Статус</th>
+                            <th>Создан</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="6" class="loading">Загрузка...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-cards">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Код</th>
+                            <th>Статус</th>
+                            <th>Владелец</th>
+                            <th>Активирована</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cardsTableBody">
+                        <tr><td colspan="6" class="loading">Загрузка...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-profiles">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Email</th>
+                            <th>Имя Фамилия</th>
+                            <th>Компания</th>
+                            <th>Телефон</th>
+                            <th>Обновлён</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="profilesTableBody">
+                        <tr><td colspan="7" class="loading">Загрузка...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-visits">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Карта</th>
+                            <th>Владелец</th>
+                            <th>Дата</th>
+                            <th>IP</th>
+                            <th>User Agent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visitsTableBody">
+                        <tr><td colspan="6" class="loading">Загрузка...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления карт -->
+    <div class="modal" id="addCardsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Добавление карт</h2>
+                <button class="modal-close" onclick="closeModal('addCardsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="mode-switcher">
+                    <button class="btn btn-primary" id="modeAutoBtn" onclick="switchAddMode('auto')">Автоматически</button>
+                    <button class="btn" id="modeManualBtn" onclick="switchAddMode('manual')">Вручную</button>
+                </div>
+
+                <div id="autoMode">
+                    <div class="form-group">
+                        <label>Префикс кода</label>
+                        <input type="text" id="addPrefix" value="VK" maxlength="10" placeholder="VK" oninput="previewCodes()">
+                        <small>Только буквы, цифры, дефис и подчёркивание</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Количество карт</label>
+                        <input type="number" id="addCount" value="10" min="1" max="1000" oninput="previewCodes()">
+                    </div>
+                    <div class="form-group">
+                        <label>Начать с номера (необязательно)</label>
+                        <input type="number" id="addStartFrom" placeholder="Оставить пустым для авто" min="1" oninput="previewCodes()">
+                    </div>
+                    <div class="preview-box">
+                        <div class="preview-title">Будут созданы коды:</div>
+                        <div class="preview-content" id="codesPreview">Загрузка...</div>
+                    </div>
+                </div>
+
+                <div id="manualMode" style="display: none;">
+                    <div class="form-group">
+                        <label>Список кодов (каждый с новой строки или через запятую)</label>
+                        <textarea id="addCodesText" class="codes-textarea" 
+                                  placeholder="VK-100&#10;VK-101&#10;VK-102&#10;&#10;или: VK-100, VK-101, VK-102"
+                                  oninput="updateManualCount()"></textarea>
+                        <small>Дубликаты будут пропущены. Максимум 1000 кодов.</small>
+                    </div>
+                    <div class="preview-box">
+                        <div>Указано кодов: <strong id="manualCount">0</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('addCardsModal')">Отмена</button>
+                <button class="btn btn-primary" onclick="submitAddCards()" id="submitAddBtn">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования профиля -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Редактирование профиля</h2>
+                <button class="modal-close" onclick="closeModal('editProfileModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editUserId">
+                <div class="form-group"><label>Имя *</label><input type="text" id="editFirstName"></div>
+                <div class="form-group"><label>Фамилия *</label><input type="text" id="editLastName"></div>
+                <div class="form-group"><label>Компания</label><input type="text" id="editCompany"></div>
+                <div class="form-group"><label>Должность</label><input type="text" id="editPosition"></div>
+                <div class="form-group"><label>Телефон *</label><input type="tel" id="editPhone"></div>
+                <div class="form-group"><label>Email *</label><input type="email" id="editEmail"></div>
+                <div class="form-group"><label>Telegram</label><input type="text" id="editTelegram"></div>
+                <div class="form-group"><label>Instagram</label><input type="text" id="editInstagram"></div>
+                <div class="form-group"><label>WhatsApp</label><input type="tel" id="editWhatsapp"></div>
+                <div class="form-group"><label>VK</label><input type="text" id="editVk"></div>
+                <div class="form-group"><label>MAX</label><input type="text" id="editMax"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('editProfileModal')">Отмена</button>
+                <button class="btn btn-primary" onclick="saveProfile()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно с новым паролем -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Новый пароль сгенерирован</h2>
+                <button class="modal-close" onclick="closeModal('passwordModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: #4a5568; line-height: 1.6;">Сообщите пользователю его новый пароль:</p>
+                <div class="password-display" id="newPasswordDisplay"></div>
+                <p style="color: #c53030; font-size: 13px; margin-top: 10px;">
+                    Важно: передайте пароль пользователю безопасным способом.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('passwordModal')">Понятно</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <header class="site-header" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-bottom: 1px solid #e2e8f0; z-index: 9999;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; height: 70px; display: flex; align-items: center; justify-content: space-between;">
+            <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #2d3748;">
+                <img src="/static/logo.jpeg" alt="Логотип" style="height: 45px; width: auto; object-fit: contain;">
+                <span style="font-size: 18px; font-weight: 600;">Виртуальные визитки</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="/cabinet" style="padding: 8px 16px; color: #4a5568; text-decoration: none; font-size: 14px; font-weight: 500;">Кабинет</a>
+                <a href="/admin" style="padding: 8px 16px; color: #4a5568; text-decoration: none; font-size: 14px; font-weight: 500;">Админ</a>
+                <a href="/login" style="padding: 8px 16px; color: #c53030; text-decoration: none; font-size: 14px; font-weight: 500;">Выйти</a>
+            </div>
+        </div>
+    </header>
+    <div style="height: 70px;"></div>
+
+    <script>
+        let currentProfiles = [];
+        let currentUsers = [];
+        let addMode = 'auto';
+        let previewTimeout = null;
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+            });
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function formatDate(isoString) {
+            if (!isoString) return '—';
+            const date = new Date(isoString);
+            return date.toLocaleString('ru-RU', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('statUsers').textContent = data.total_users;
+                    document.getElementById('statCards').textContent = data.total_cards;
+                    document.getElementById('statFree').textContent = data.free_cards;
+                    document.getElementById('statActivated').textContent = data.activated_cards;
+                    document.getElementById('statProfiles').textContent = data.total_profiles;
+                    document.getElementById('statVisits').textContent = data.total_visits;
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                const users = await response.json();
+                currentUsers = users;
+                const tbody = document.getElementById('usersTableBody');
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Пользователей нет</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = users.map(user => `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.email}</td>
+                        <td>${user.activation_code || '—'}</td>
+                        <td>${user.status ? `<span class="status status-${user.status}">${user.status}</span>` : '—'}</td>
+                        <td>${formatDate(user.created_at)}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="resetPassword(${user.id})">Сброс пароля</button>
+                            <button class="btn btn-danger" onclick="deleteUser(${user.id}, '${user.email}')">Удалить</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Ошибка загрузки пользователей:', error);
+                showToast('Ошибка загрузки', 'error');
+            }
+        }
+
+        async function loadCards() {
+            try {
+                const response = await fetch('/api/admin/cards');
+                const cards = await response.json();
+                const tbody = document.getElementById('cardsTableBody');
+                if (cards.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Карт нет</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = cards.map(card => `
+                    <tr>
+                        <td>${card.id}</td>
+                        <td><strong>${card.activation_code}</strong></td>
+                        <td>
+                            <select onchange="updateCardStatus(${card.id}, this.value)" style="padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px;">
+                                <option value="free" ${card.status === 'free' ? 'selected' : ''}>free</option>
+                                <option value="activated" ${card.status === 'activated' ? 'selected' : ''}>activated</option>
+                                <option value="blocked" ${card.status === 'blocked' ? 'selected' : ''}>blocked</option>
+                            </select>
+                        </td>
+                        <td>${card.email || '—'}</td>
+                        <td>${formatDate(card.activated_at)}</td>
+                        <td>
+                            ${card.user_id ? `<button class="btn btn-warning" onclick="unlinkCard(${card.id})">Отвязать</button>` : ''}
+                            <button class="btn btn-danger" onclick="deleteCard(${card.id}, '${card.activation_code}')">Удалить</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Ошибка загрузки карт:', error);
+            }
+        }
+
+        async function loadProfiles() {
+            try {
+                const response = await fetch('/api/admin/profiles');
+                const profiles = await response.json();
+                currentProfiles = profiles;
+                const tbody = document.getElementById('profilesTableBody');
+                if (profiles.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Профилей нет</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = profiles.map(p => `
+                    <tr>
+                        <td>${p.user_id}</td>
+                        <td>${p.user_email}</td>
+                        <td>${p.first_name} ${p.last_name}</td>
+                        <td>${p.company || '—'}</td>
+                        <td>${p.phone}</td>
+                        <td>${formatDate(p.updated_at)}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editProfile(${p.user_id})">Изменить</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Ошибка загрузки профилей:', error);
+            }
+        }
+
+        async function loadVisits() {
+            try {
+                const response = await fetch('/api/admin/visits');
+                const visits = await response.json();
+                const tbody = document.getElementById('visitsTableBody');
+                if (visits.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Посещений нет</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = visits.map(v => `
+                    <tr>
+                        <td>${v.id}</td>
+                        <td><strong>${v.activation_code}</strong></td>
+                        <td>${v.email || '—'}</td>
+                        <td>${formatDate(v.visited_at)}</td>
+                        <td>${v.ip || '—'}</td>
+                        <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${v.user_agent || ''}">${v.user_agent || '—'}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Ошибка загрузки посещений:', error);
+            }
+        }
+
+        async function deleteUser(id, email) {
+            if (!confirm(`Удалить пользователя ${email}?\nВсе связанные данные будут удалены.`)) return;
+            try {
+                const response = await fetch(`/api/admin/user/${id}`, { method: 'DELETE' });
+                const data = await response.json();
+                if (response.ok) {
+                    showToast('Пользователь удалён');
+                    loadUsers(); loadCards(); loadProfiles(); loadStats();
+                } else {
+                    showToast(data.error || 'Ошибка удаления', 'error');
+                }
+            } catch (error) {
+                showToast('Ошибка соединения', 'error');
+            }
+        }
+
+        async function deleteCard(id, code) {
+            if (!confirm(`Удалить карту ${code}?`)) return;
+            try {
+                const response = await fetch(`/api/admin/card/${id}`, { method: 'DELETE' });
+                const data = await response.json();
+                if (response.ok) {
+                    showToast('Карта удалена');
+                    loadCards(); loadStats();
+                } else {
+                    showToast(data.error || 'Ошибка', 'error');
+                }
+            } catch (error) {
+                showToast('Ошибка соединения', 'error');
+            }
+        }
+
+        async function unlinkCard(id) {
+            if (!confirm('Отвязать карту от пользователя?\nКарта станет свободной.')) return;
+            try {
+                const response = await fetch(`/api/admin/card/${id}/unlink`, { method: 'POST' });
+                const data = await response.json();
+                if (response.ok) {
+                    showToast('Карта отвязана');
+                    loadCards(); loadUsers(); loadStats();
+                } else {
+                    showToast(data.error || 'Ошибка', 'error');
+                }
+            } catch (error) {
+                showToast('Ошибка соединения', 'error');
+            }
+        }
+
+        async function updateCardStatus(id, status) {
+            try {
+                const response = await fetch(`/api/admin/card/${id}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showToast('Статус обновлён');
+                    loadCards(); loadStats();
+                } else {
+                    showToast(data.error || 'Ошибка', 'error');
+                    loadCards();
+                }
+            } catch (error) {
+                showToast('Ошибка соединения', 'error');
+                loadCards();
+            }
+        }
+
+        async function resetPassword(userId) {
+            if (!confirm('Сбросить пароль пользователя?\nБудет сгенерирован новый пароль.')) return;
+            try {
+                const response = await fetch(`/api/admin/user/${userId}/reset-password`, { method: 'POST' });
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('newPasswordDisplay').textContent = data.new_password;
+                    openModal('passwordModal');
+                } else {
+                    showToast(data.error || 'Ошибка', 'error');
+                }
+            } catch (error) {
+                showToast('Ошибка соединения', 'error');
+            }
+        }
+
+        function editProfile(userId) {
+            const profile = currentProfiles.find(p => p.user_id === userId);
+            if (!profile) return;
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editFirstName').value = profile.first_name || '';
+            document.getElementById('editLastName').value = profile.last_name || '';
+            document.getElementById('editCompany').value = profile.company || '';
+            document.getElementById('editPosition').value = profile.position || '';
+            document.getElementById('editPhone').value = profile.phone || '';
+            document.getElementById('editEmail').value = profile.email || '';
+            document.getElementById('editTelegram').value = profile.social_telegram || '';
+            document.getElementById('editInstagram').value = profile.social_instagram || '';
+            document.getElementById('editWhatsapp').value = profile.social_whatsapp || '';
+            document.getElementById('editVk').value = profile.social_vk || '';
+            document.getElementById('editMax').value = profile.social_max || '';
+            openModal('editProfileModal');
+        }
+
+        async function saveProfile() {
+            const userId = document.getElementById('editUserId').value;
+            const data = {
+                first_name: document.getElementById('editFirstName').value.trim(),
+                last_name: document.getElementById('editLastName').value.trim(),
+                company: document.getElementById('editCompany').value.trim(),
+                position: document.getElementById('editPosition').value.trim(),
+                phone: document.getElementById('editPhone').value.trim(),
+                email: document.getElementById('editEmail').value.trim(),
+                social_telegram: document.getElementById('editTelegram').value.trim(),
+                social_instagram: document.getElementById('editInstagram').value.trim(),
+                social_whatsapp: document.getElementById('editWhatsapp').value.trim(),
+                social_vk: document.getElementById('editVk').value.trim(),
+                social_max: document.getElementById('editMax').value.trim()
+            };
+            try {
+                const response = await fetch(`/api/admin/profile/${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showToast('Профиль обновлён');
+                    closeModal('editProfileModal');
+                    loadProfiles();
+                } else {
+                    showToast(result.error || 'Ошибка', 'error');
+                }
+            } catch (error) {
+                showToast('Ошибка соединения', 'error');
+            }
+        }
+
+        // Добавление карт
+        function openAddCardsModal() {
+            openModal('addCardsModal');
+            switchAddMode('auto');
+        }
+
+        function switchAddMode(mode) {
+            addMode = mode;
+            document.getElementById('autoMode').style.display = mode === 'auto' ? 'block' : 'none';
+            document.getElementById('manualMode').style.display = mode === 'manual' ? 'block' : 'none';
+            document.getElementById('modeAutoBtn').className = mode === 'auto' ? 'btn btn-primary' : 'btn';
+            document.getElementById('modeManualBtn').className = mode === 'manual' ? 'btn btn-primary' : 'btn';
+            if (mode === 'auto') previewCodes();
+            else updateManualCount();
+        }
+
+        function previewCodes() {
+            clearTimeout(previewTimeout);
+            previewTimeout = setTimeout(async () => {
+                const prefix = document.getElementById('addPrefix').value.trim().toUpperCase() || 'VK';
+                const count = Math.min(parseInt(document.getElementById('addCount').value) || 10, 20);
+                const startFrom = document.getElementById('addStartFrom').value;
+                let url = `/api/admin/cards/next-codes?prefix=${encodeURIComponent(prefix)}&count=${count}`;
+                if (startFrom) url += `&start_from=${startFrom}`;
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (response.ok) {
+                        const preview = document.getElementById('codesPreview');
+                        if (data.codes.length === 0) {
+                            preview.innerHTML = '<span style="color: #c53030;">Не удалось сгенерировать коды</span>';
+                        } else {
+                            preview.innerHTML = data.codes.map(c => `<div>${c}</div>`).join('');
+                            const total = parseInt(document.getElementById('addCount').value) || 10;
+                            if (data.codes.length < Math.min(total, 20)) {
+                                preview.innerHTML += `<div style="color: #718096; margin-top: 8px;">... и ещё</div>`;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Ошибка предпросмотра:', error);
+                }
+            }, 300);
+        }
+
+        function updateManualCount() {
+            const text = document.getElementById('addCodesText').value;
+            const codes = text.replace(/,/g, '\n').split('\n').filter(c => c.trim()).length;
+            document.getElementById('manualCount').textContent = codes;
+        }
+
+        async function submitAddCards() {
+            const submitBtn = document.getElementById('submitAddBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Добавление...';
+            try {
+                let body;
+                if (addMode === 'auto') {
+                    const prefix = document.getElementById('addPrefix').value.trim().toUpperCase();
+                    const count = parseInt(document.getElementById('addCount').value);
+                    const startFrom = document.getElementById('addStartFrom').value;
+                    body = { mode: 'auto', prefix: prefix, count: count };
+                    if (startFrom) body.start_from = parseInt(startFrom);
+                } else {
+                    body = { mode: 'manual', codes: document.getElementById('addCodesText').value };
+                }
+                const response = await fetch('/api/admin/cards/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    let message = data.message;
+                    if (data.skipped > 0) message += `\nПропущено дубликатов: ${data.skipped}`;
+                    if (data.errors && data.errors.length > 0) message += `\n\nОшибки:\n` + data.errors.join('\n');
+                    showToast(message);
+                    closeModal('addCardsModal');
+                    loadCards(); loadStats();
+                    document.getElementById('addCodesText').value = '';
+                    updateManualCount();
+                } else {
+                    showToast(data.error || 'Ошибка добавления', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showToast('Ошибка соединения', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Добавить';
+            }
+        }
+
+        loadStats();
+        loadUsers();
+        loadCards();
+        loadProfiles();
+        loadVisits();
+    </script>
+</body>
+</html>
